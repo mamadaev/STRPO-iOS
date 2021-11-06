@@ -1,0 +1,20 @@
+PODS:
+  - SnapKit (5.0.1)
+  - YandexMapsMobile (4.0.0-lite)
+
+DEPENDENCIES:
+  - SnapKit
+  - YandexMapsMobile (= 4.0.0-lite)
+
+SPEC REPOS:
+  trunk:
+    - SnapKit
+    - YandexMapsMobile
+
+SPEC CHECKSUMS:
+  SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
+  YandexMapsMobile: d7d7f3b452209b4c2787beb53bb2dfcea259c70c
+
+PODFILE CHECKSUM: 6c3adb8d980b729ada0815d3c9191f1c521f4c7d
+
+COCOAPODS: 1.10.1
