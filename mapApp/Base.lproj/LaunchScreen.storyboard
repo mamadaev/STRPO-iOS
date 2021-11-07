@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
-        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -17,18 +16,19 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="splashScreen_Dark" translatesAutoresizingMaskIntoConstraints="NO" id="Kdc-T4-nl4">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
-                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="default"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="map" translatesAutoresizingMaskIntoConstraints="NO" id="M8Z-QA-Ojr">
+                                <rect key="frame" x="79" y="144" width="256" height="256"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="256" id="flF-A2-wbr"/>
+                                    <constraint firstAttribute="width" constant="256" id="vze-Xq-nXD"/>
+                                </constraints>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" red="0.99942404029999998" green="0.98555368190000003" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="Kdc-T4-nl4" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="MHd-T6-zH3"/>
-                            <constraint firstItem="Kdc-T4-nl4" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="N7k-SB-XFa"/>
-                            <constraint firstAttribute="bottom" secondItem="Kdc-T4-nl4" secondAttribute="bottom" id="nEt-dd-7jx"/>
-                            <constraint firstAttribute="trailing" secondItem="Kdc-T4-nl4" secondAttribute="trailing" id="uwI-Eo-Aje"/>
+                            <constraint firstItem="M8Z-QA-Ojr" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="Sgl-3y-7PX"/>
+                            <constraint firstItem="M8Z-QA-Ojr" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="100" id="YkD-VX-o6h"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -38,9 +38,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="splashScreen_Dark" width="1284" height="2598"/>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
+        <image name="map" width="512" height="512"/>
     </resources>
 </document>
