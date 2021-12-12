@@ -1,24 +1,25 @@
 //
-//  LoginViewController.swift
+//  AddLocationViewController.swift
 //  mapApp
 //
-//  Created by i.mamadaev on 06.11.2021.
+//  Created by i.mamadaev on 14.11.2021.
 //
 
 import UIKit
 
-class LoginViewController: UIViewController {
+class AddLocationViewController: UIViewController {
 
     private let loginInput = UITextField()
     private let passwordInput = UITextField()
+    private let nameInput = UITextField()
+
     private let backButton = UIButton()
     private let closeButton = UIImageView()
     private let titleLabel = UILabel()
-    private let forgotLabel = UILabel()
-    private let continueLabel = UILabel()
     
     private let loginLine = UIView()
     private let passwordLine = UIView()
+    private let nameLine = UIView()
 
 
     override func viewDidLoad() {
@@ -46,13 +47,13 @@ class LoginViewController: UIViewController {
             $0.centerX.equalToSuperview()
         }
         titleLabel.font = UIFont(name: "AppleSDGothicNeo-Thin", size: 30)
-        titleLabel.text = "Войти"
+        titleLabel.text = "Добавить локацию"
         titleLabel.textColor = .black
         
         // Login input
         loginInput.backgroundColor = .clear
-        loginInput.placeholder = "Логин"
-        loginInput.text = "test"
+        loginInput.placeholder = "Ширина"
+        loginInput.text = "55.751"
         loginInput.textAlignment = .center
         loginInput.font = UIFont.systemFont(ofSize: 16)
         loginInput.autocapitalizationType = .none
@@ -75,12 +76,11 @@ class LoginViewController: UIViewController {
         
         // Password input
         passwordInput.backgroundColor = .clear
-        passwordInput.placeholder = "Пароль"
-        passwordInput.text = "test"
+        passwordInput.placeholder = "Долгота"
+        passwordInput.text = "37.631"
         passwordInput.textAlignment = .center
         passwordInput.font = UIFont.systemFont(ofSize: 16)
         passwordInput.autocapitalizationType = .none
-        passwordInput.isSecureTextEntry = true
         passwordInput.autocorrectionType = .no
 
         view.addSubview(passwordInput)
@@ -99,21 +99,29 @@ class LoginViewController: UIViewController {
             $0.left.right.equalToSuperview()
         }
         
-        // Forgot input
-        forgotLabel.backgroundColor = .clear
-        forgotLabel.text = "Забыли пароль?"
-        forgotLabel.textAlignment = .center
-        forgotLabel.font = UIFont(name: "AppleSDGothicNeo-Thin", size: 18)
-        forgotLabel.textColor = .systemBlue
-        view.addSubview(forgotLabel)
-        forgotLabel.sizeToFit()
-        forgotLabel.snp.makeConstraints {
+        // Login input
+        nameInput.backgroundColor = .clear
+        nameInput.placeholder = "Название"
+        nameInput.text = "Кафе Му-му"
+        nameInput.textAlignment = .center
+        nameInput.font = UIFont.systemFont(ofSize: 16)
+        nameInput.autocapitalizationType = .none
+        nameInput.autocorrectionType = .no
+        view.addSubview(nameInput)
+        nameInput.snp.makeConstraints {
+            $0.size.height.equalTo(60)
             $0.centerX.equalToSuperview()
-            $0.top.equalTo(passwordInput.snp.bottom).offset(20)
+            $0.top.equalTo(passwordInput.snp.bottom).offset(10)
+            $0.left.equalTo(view.snp.left).offset(64)
+            $0.right.equalTo(view.snp.right).offset(-64)
         }
-        let labelTap = UITapGestureRecognizer(target: self, action: #selector(forgotButtonPressed))
-        forgotLabel.isUserInteractionEnabled = true
-        forgotLabel.addGestureRecognizer(labelTap)
+        nameLine.backgroundColor = .gray
+        nameInput.addSubview(nameLine)
+        nameLine.snp.makeConstraints {
+            $0.size.height.equalTo(1)
+            $0.bottom.equalToSuperview()
+            $0.left.right.equalToSuperview()
+        }
         
         // Button
         backButton.backgroundColor = .white
@@ -121,7 +129,7 @@ class LoginViewController: UIViewController {
         backButton.layer.cornerRadius = 30
         backButton.backgroundColor = UIColor(red: 185/255, green: 190/255, blue: 197/255, alpha: 1)
         backButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
-        backButton.setTitle("Войти", for: .normal)
+        backButton.setTitle("Добавить", for: .normal)
         backButton.addTarget(self, action: #selector(enterPressed), for: .touchUpInside)
 
         backButton.sizeToFit()
@@ -129,7 +137,7 @@ class LoginViewController: UIViewController {
             $0.centerX.equalToSuperview()
             $0.right.equalToSuperview().offset(-64)
             $0.left.equalToSuperview().offset(64)
-            $0.top.equalTo(passwordInput.snp.bottom).offset(80)
+            $0.top.equalTo(nameInput.snp.bottom).offset(80)
             $0.size.height.equalTo(60)
         }
         
@@ -145,19 +153,6 @@ class LoginViewController: UIViewController {
         let gesture = UITapGestureRecognizer(target: self, action: #selector(closeButtonPressed))
         closeButton.isUserInteractionEnabled = true
         closeButton.addGestureRecognizer(gesture)
-        
-        // Contrinue label
-        continueLabel.textColor = .lightGray
-        continueLabel.text = "Продолжить без регистрации"
-        view.addSubview(continueLabel)
-        continueLabel.sizeToFit()
-        continueLabel.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.bottom.equalTo(view.snp.bottom).offset(-50)
-        }
-        let continueTap = UITapGestureRecognizer(target: self, action: #selector(continueButtonPressed))
-        continueLabel.isUserInteractionEnabled = true
-        continueLabel.addGestureRecognizer(continueTap)
     }
     
     @objc func enterPressed() {
@@ -169,15 +164,17 @@ class LoginViewController: UIViewController {
         
         print(isUserRegistered(login: login, password: password))
         if isUserRegistered(login: login, password: password) {
-            self.dismiss(animated: true, completion: nil)
-            UserDefaults.standard.set(true, forKey: "LOGGED_IN")
-            AppDelegate.shared.rootViewController.switchToMainScreen()
-        } else {
-            shakeTextField(textField: loginInput, numberOfShakes:0, direction: 1, maxShakes : 5)
-            shakeTextField(textField: passwordInput, numberOfShakes:0, direction: 1, maxShakes : 5)
+            // the alert view
+            let alert = UIAlertController(title: "", message: "Локация добавлена", preferredStyle: .alert)
+            self.present(alert, animated: true, completion: nil)
 
-            passwordLine.backgroundColor = .red
-            loginLine.backgroundColor = .red
+            // change to desired number of seconds (in this case 5 seconds)
+            let when = DispatchTime.now() + 2
+            DispatchQueue.main.asyncAfter(deadline: when){
+                // your code with delay
+                alert.dismiss(animated: true, completion: nil)
+                self.dismiss(animated: true, completion: nil)
+            }
         }
     }
     
@@ -186,29 +183,17 @@ class LoginViewController: UIViewController {
         self.dismiss(animated: true, completion: nil)
     }
     
-    @objc func forgotButtonPressed() {
-        let vc = ForgotPasswordViewController()
-        vc.modalPresentationStyle = .fullScreen
-        self.present(vc, animated: true, completion: nil)
-    }
-    
-    @objc func continueButtonPressed() {
-        let vc = MapViewController()
-        vc.modalPresentationStyle = .fullScreen
-        self.present(vc, animated: true, completion: nil)
-    }
-    
     // MARK: - HTTP Request Handler
     
     private func isUserRegistered(login: String, password: String) -> Bool {
         let sem = DispatchSemaphore.init(value: 0)
 
         var isUserRegistered: Bool = false
-        guard let url = URL(string: "http://134.0.117.63:8081/is_signed") else { return false }
+        guard let url = URL(string: "http://134.0.117.63:8081/add_place") else { return false }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        let parameters = ["login": login, "password_encrypted": password, "secret": "secret"]
+        let parameters = ["user_id": "831d9092-629c-4f89-8e6e-9ee5b907291f", "category_id": "test category", "lat": Float(loginInput.text ?? "0.0") ?? 0.0, "long": Float(passwordInput.text ?? "0.0") ?? 0.0, "name": nameInput.text ?? "", "secret": "secret"] as [String : Any]
         
         guard let httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: []) else {
             return false
@@ -221,31 +206,12 @@ class LoginViewController: UIViewController {
             let strResponse = String(decoding: data, as: UTF8.self)
             defer { sem.signal() }
 
-            isUserRegistered = strResponse == "true" ? true : false
+            isUserRegistered = strResponse == "\"ok\"" ? true : false
         }.resume()
         
         sem.wait()
 
         return isUserRegistered
     }
-    
-    func shakeTextField(textField: UITextField, numberOfShakes: Int, direction: CGFloat, maxShakes: Int) {
 
-        let interval: TimeInterval = 0.05
-
-        UIView.animate(withDuration: interval, animations: { () -> Void in
-            textField.transform = CGAffineTransform(translationX: 5 * direction, y: 0)
-
-            }, completion: { (aBool :Bool) -> Void in
-
-                if (numberOfShakes >= maxShakes) {
-                    textField.transform = .identity
-                    textField.becomeFirstResponder()
-                    return
-                }
-
-                self.shakeTextField(textField: textField, numberOfShakes: numberOfShakes + 1, direction: direction * -1, maxShakes: maxShakes)
-        })
-
-    }
 }

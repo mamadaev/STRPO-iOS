@@ -269,9 +269,8 @@ class RegisterViewController: UIViewController {
         }
         
         if registerUser(login: login, password: password, fio: fio) {
-            let vc = LoginViewController()
-            vc.modalPresentationStyle = .fullScreen
-            self.present(vc, animated: true, completion: nil)
+            self.dismiss(animated: true, completion: nil)
+            AppDelegate.shared.rootViewController.switchToLogin()
         } else {
             let alert = UIAlertController(title: "Ошибка", message: "Такой логин уже используется", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in

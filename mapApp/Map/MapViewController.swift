@@ -9,23 +9,38 @@ import UIKit
 import SnapKit
 import YandexMapsMobile
 
-class MapViewController: UIViewController {
+class MapNavigationViewController: UINavigationController { }
 
-    let CAMERA_TARGET = YMKPoint(latitude: 59.952, longitude: 30.318)
-    let ANIMATED_RECTANGLE_CENTER = YMKPoint(latitude: 59.956, longitude: 30.313)
-    let TRIANGLE_CENTER = YMKPoint(latitude: 59.948, longitude: 30.313)
-    let POLYLINE_CENTER = YMKPoint(latitude: 59.952, longitude: 30.318)
-    let CIRCLE_CENTER = YMKPoint(latitude: 59.956, longitude: 30.323)
-    let DRAGGABLE_PLACEMARK_CENTER = YMKPoint(latitude: 59.948, longitude: 30.323)
-    let ANIMATED_PLACEMARK_CENTER = YMKPoint(latitude: 59.948, longitude: 30.318)
-    let OBJECT_SIZE: Double = 0.0015
+class MapViewController: UIViewController, YMKClusterListener, YMKClusterTapListener, YMKMapObjectTapListener {
     
-    private var animationIsActive = true
+    // YMK Properies
+    private let mapView = YMKMapView()
+    private var imageProvider = UIImage(named: "SearchResult")!
+    private let moscow = YMKPoint(latitude: 55.756, longitude: 37.618)
+    private let CLUSTER_CENTERS: [YMKPoint] = [
+        YMKPoint(latitude: 55.756, longitude: 37.618)
+    ]
+    private let PLACEMARKS_NUMBER = 1000
+    private let FONT_SIZE: CGFloat = 15
+    private let MARGIN_SIZE: CGFloat = 3
+    private let STROKE_SIZE: CGFloat = 3
     private var circleMapObjectTapListener: YMKMapObjectTapListener!
     
-    private let backButton = UIButton()
+    // ZOOM
+    private var zoomLvl: Float = 5
 
-    /// Private properties
+    // Private
+    private let menuButton = UIImageView()
+    private let userIconButton = UIImageView()
+    private let newLocsButton = UIImageView()
+    private let sampleButton = UIImageView()
+    
+    private let addButton = UIImageView()
+    private let zoomInButton = UIImageView()
+    private let zoomOutButton = UIImageView()
+    private let locButton = UIImageView()
+
+    private var animationIsActive = true
     private lazy var backgroundView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor.systemBackground
@@ -40,76 +55,162 @@ class MapViewController: UIViewController {
         return label
     }()
     
-    private let mapView = YMKMapView()
-
-    
-//    override var preferredStatusBarStyle: UIStatusBarStyle {
-//        .lightContent
-//    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setupMap()
         setupUI()
         setupConstraints()
         
-        createMapObjects()
-
-        
-        mapView.mapWindow.map.move(
-                with: YMKCameraPosition.init(target: YMKPoint(latitude: 59.949941, longitude: 30.310250), zoom: 13, azimuth: 0, tilt: 0),
-                animationType: YMKAnimation(type: YMKAnimationType.smooth, duration: 5),
-                cameraCallback: nil)
-        
-//        let style = "[" +
-//                    "        {" +
-//                    "            \"types\": \"point\"," +
-//                    "            \"tags\": {" +
-//                    "                \"all\": [" +
-//                    "                    \"poi\"" +
-//                    "                ]" +
-//                    "            }," +
-//                    "            \"stylers\": {" +
-//                    "                \"color\": \"000000\"" +
-//                    "            }" +
-//                    "        }" +
-//                    "    ]";
-        
-//        mapView.mapWindow.map.setMapStyleWithStyle(style)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setNeedsStatusBarAppearanceUpdate()
-//        addGradient()
+        navigationController?.setNavigationBarHidden(true, animated: animated)
     }
     
+    // MARK: - Setup UI
+    
     private func setupUI() {
-        view.backgroundColor = UIColor.systemBackground
+        view.backgroundColor = .black
+        backgroundView.backgroundColor = .black
+        
         
         view.addSubview(backgroundView)
         backgroundView.addSubview(testLabel)
         backgroundView.addSubview(mapView)
         
-        
-        // Button
-        view.addSubview(backButton)
-        backButton.backgroundColor = .white
-        backButton.setTitleColor(.white, for: .selected)
-        backButton.layer.cornerRadius = 30
-        backButton.backgroundColor = UIColor(red: 185/255, green: 190/255, blue: 197/255, alpha: 1)
-        backButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
-        backButton.setTitle("Выйти", for: .normal)
-        backButton.addTarget(self, action: #selector(logoutPressed), for: .touchUpInside)
-
-        backButton.sizeToFit()
-        backButton.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.right.equalToSuperview().offset(-64)
-            $0.left.equalToSuperview().offset(64)
-            $0.bottom.equalTo(view.snp.bottom).offset(-40)
-            $0.size.height.equalTo(60)
+        // Bottom menu
+        let menuView = UIView()
+        menuView.backgroundColor = UIColor.black.withAlphaComponent(0.25)
+        view.addSubview(menuView)
+        menuView.layer.cornerRadius = 20
+        menuView.snp.makeConstraints {
+            $0.left.right.bottom.equalToSuperview()
+            $0.size.height.equalTo(90)
         }
+        
+        // Menu Button
+        view.addSubview(menuButton)
+        menuButton.image = UIImage(named: "list")
+        menuButton.contentMode = .center
+        menuButton.snp.makeConstraints {
+            $0.centerY.equalTo(menuView)
+            $0.left.equalToSuperview().offset(48)
+            $0.size.width.equalTo(32)
+            $0.size.height.equalTo(32)
+        }
+        let menuButtonGesture = UITapGestureRecognizer(target: self, action: #selector(menuButtonPressed))
+        menuButton.isUserInteractionEnabled = true
+        menuButton.addGestureRecognizer(menuButtonGesture)
+        
+        // Flag Button
+        view.addSubview(userIconButton)
+        userIconButton.image = UIImage(named: "profile-user")
+        userIconButton.contentMode = .center
+        userIconButton.snp.makeConstraints {
+            $0.centerY.equalTo(menuView)
+            $0.left.equalTo(menuButton.snp.right).offset(32)
+            $0.size.width.equalTo(32)
+            $0.size.height.equalTo(32)
+        }
+        let flagButtonGesture = UITapGestureRecognizer(target: self, action: #selector(userIconButtonPressed))
+        userIconButton.isUserInteractionEnabled = true
+        userIconButton.addGestureRecognizer(flagButtonGesture)
+        
+        // Update locations
+        view.addSubview(newLocsButton)
+        newLocsButton.image = UIImage(named: "flags")
+        newLocsButton.contentMode = .center
+        newLocsButton.snp.makeConstraints {
+            $0.centerY.equalTo(menuView)
+            $0.right.equalToSuperview().offset(-48)
+            $0.size.width.equalTo(32)
+            $0.size.height.equalTo(32)
+        }
+        let newLocsButtonGesture = UITapGestureRecognizer(target: self, action: #selector(newLocsButtonPressed))
+        newLocsButton.isUserInteractionEnabled = true
+        newLocsButton.addGestureRecognizer(newLocsButtonGesture)
+        
+        // Sample Button
+        view.addSubview(sampleButton)
+        sampleButton.image = UIImage(named: "bubble-chat")
+        sampleButton.contentMode = .center
+        sampleButton.snp.makeConstraints {
+            $0.centerY.equalTo(menuView)
+            $0.right.equalTo(newLocsButton.snp.left).offset(-32)
+            $0.size.width.equalTo(32)
+            $0.size.height.equalTo(32)
+        }
+        let sampleButtonGesture = UITapGestureRecognizer(target: self, action: #selector(sampleButtonPressed))
+        sampleButton.isUserInteractionEnabled = true
+        sampleButton.addGestureRecognizer(sampleButtonGesture)
+        
+        // Add Button
+        view.addSubview(addButton)
+//        addButton.backgroundColor = UIColor.black.withAlphaComponent(0.25)
+//        addButton.layer.cornerRadius = 45
+        addButton.image = UIImage(named: "plus_w_64")
+        addButton.contentMode = .center
+        addButton.snp.makeConstraints {
+            $0.bottom.equalToSuperview().offset(-5)
+            $0.centerX.equalToSuperview()
+            $0.size.width.equalTo(90)
+            $0.size.height.equalTo(90)
+        }
+        let addButtonGesture = UITapGestureRecognizer(target: self, action: #selector(addButtonPressed))
+        addButton.isUserInteractionEnabled = true
+        addButton.addGestureRecognizer(addButtonGesture)
+        
+        // zoom In Button
+        view.addSubview(zoomInButton)
+        zoomInButton.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25)
+        zoomInButton.layer.cornerRadius = 24
+        zoomInButton.image = UIImage(named: "zoom-in")
+        zoomInButton.contentMode = .center
+        zoomInButton.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(300)
+            $0.right.equalToSuperview().offset(-16)
+            $0.size.width.equalTo(48)
+            $0.size.height.equalTo(48)
+        }
+        let zoomInButtonGesture = UITapGestureRecognizer(target: self, action: #selector(zoomInButtonPressed))
+        zoomInButton.isUserInteractionEnabled = true
+        zoomInButton.addGestureRecognizer(zoomInButtonGesture)
+        
+        // zoom out Button
+        view.addSubview(zoomOutButton)
+        zoomOutButton.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25)
+        zoomOutButton.layer.cornerRadius = 24
+        zoomOutButton.image = UIImage(named: "zoom-out")
+        zoomOutButton.contentMode = .center
+        zoomOutButton.snp.makeConstraints {
+            $0.top.equalTo(zoomInButton.snp.bottom).offset(10)
+            $0.right.equalToSuperview().offset(-16)
+            $0.size.width.equalTo(48)
+            $0.size.height.equalTo(48)
+        }
+        let zoomOutButtonGesture = UITapGestureRecognizer(target: self, action: #selector(zoomOutButtonPressed))
+        zoomOutButton.isUserInteractionEnabled = true
+        zoomOutButton.addGestureRecognizer(zoomOutButtonGesture)
+        
+        // user location button
+        view.addSubview(locButton)
+        locButton.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25)
+        locButton.layer.cornerRadius = 24
+        locButton.image = UIImage(named: "navigation_w")
+        locButton.contentMode = .center
+        locButton.snp.makeConstraints {
+            $0.top.equalTo(zoomOutButton.snp.bottom).offset(64)
+            $0.right.equalToSuperview().offset(-16)
+            $0.size.width.equalTo(48)
+            $0.size.height.equalTo(48)
+        }
+        let locButtonGesture = UITapGestureRecognizer(target: self, action: #selector(locButtonPressed))
+        locButton.isUserInteractionEnabled = true
+        locButton.addGestureRecognizer(locButtonGesture)
     }
     
     private func setupConstraints() {
@@ -119,226 +220,283 @@ class MapViewController: UIViewController {
         testLabel.snp.makeConstraints {
             $0.center.equalToSuperview()
         }
+        mapView.layer.cornerRadius = 5
         mapView.snp.makeConstraints {
-            $0.top.left.right.equalTo(self.backgroundView.safeAreaLayoutGuide)
-            $0.height.equalTo(350.0)
+            $0.top.bottom.left.right.equalToSuperview()
+//            equalTo(menuButton.snp.bottom).offset(10)
+//            $0.left.right.equalTo(self.backgroundView.safeAreaLayoutGuide)
+//            $0.height.equalTo(650.0)
         }
     }
     
-    @objc private func logoutPressed() {
-        self.dismiss(animated: true, completion: nil)
+    // MARK: - Map setup
+    
+    private func setupMap() {
+        let cameraPosition = YMKCameraPosition(
+            target: CLUSTER_CENTERS[0], zoom: zoomLvl, azimuth: 0, tilt: 0)
+        mapView.mapWindow.map.move(with: cameraPosition)
     }
     
+    // MARK: - YMK Protocols conformation
     
-    
-    
-    
-    
-    
-    
-    
-    func createMapObjects() {
-            let mapObjects = mapView.mapWindow.map.mapObjects
-            let animatedPolygonPoints = [
-                YMKPoint(
-                    latitude: ANIMATED_RECTANGLE_CENTER.latitude - OBJECT_SIZE,
-                    longitude: ANIMATED_RECTANGLE_CENTER.longitude - OBJECT_SIZE),
-                YMKPoint(
-                    latitude: ANIMATED_RECTANGLE_CENTER.latitude - OBJECT_SIZE,
-                    longitude: ANIMATED_RECTANGLE_CENTER.longitude + OBJECT_SIZE),
-                YMKPoint(
-                    latitude: ANIMATED_RECTANGLE_CENTER.latitude + OBJECT_SIZE,
-                    longitude: ANIMATED_RECTANGLE_CENTER.longitude + OBJECT_SIZE),
-                YMKPoint(
-                    latitude: ANIMATED_RECTANGLE_CENTER.latitude + OBJECT_SIZE,
-                    longitude: ANIMATED_RECTANGLE_CENTER.longitude - OBJECT_SIZE)
-            ]
-            
-            let animatedRectangle = mapObjects.addPolygon(
-                with: YMKPolygon(outerRing: YMKLinearRing(points: animatedPolygonPoints), innerRings: []))
-            animatedRectangle.fillColor = UIColor.clear
-            animatedRectangle.strokeColor = UIColor.clear
-            let animatedImage = YRTAnimatedImageProviderFactory.fromFile(
-                Bundle.main.path(forResource: "Animations/animation", ofType: "png")) as! YRTAnimatedImageProvider
-            animatedRectangle.setAnimatedImageWithAnimatedImage(
-                animatedImage, patternWidth: 32)
-            
-            let trianglePoints = [
-                YMKPoint(
-                    latitude: TRIANGLE_CENTER.latitude + OBJECT_SIZE,
-                    longitude: TRIANGLE_CENTER.longitude - OBJECT_SIZE),
-                YMKPoint(
-                    latitude: TRIANGLE_CENTER.latitude - OBJECT_SIZE,
-                    longitude: TRIANGLE_CENTER.longitude - OBJECT_SIZE),
-                YMKPoint(
-                    latitude: TRIANGLE_CENTER.latitude,
-                    longitude: TRIANGLE_CENTER.longitude + OBJECT_SIZE)
-            ]
-            
-            let triangle = mapObjects.addPolygon(
-                with: YMKPolygon(outerRing: YMKLinearRing(points: trianglePoints), innerRings: []))
-            triangle.fillColor = UIColor.blue
-            triangle.strokeColor = UIColor.black
-            triangle.strokeWidth = 1
-            triangle.zIndex = 100
-            
-            createTappableCircle();
-            
-            let polylinePoints = [
-                YMKPoint(
-                    latitude: POLYLINE_CENTER.latitude + OBJECT_SIZE,
-                    longitude: POLYLINE_CENTER.longitude - OBJECT_SIZE),
-                YMKPoint(
-                    latitude: POLYLINE_CENTER.latitude - OBJECT_SIZE,
-                    longitude: POLYLINE_CENTER.longitude - OBJECT_SIZE),
-                YMKPoint(
-                    latitude: POLYLINE_CENTER.latitude,
-                    longitude: POLYLINE_CENTER.longitude + OBJECT_SIZE)
-            ]
-            let polyline = mapObjects.addPolyline(with: YMKPolyline(points: polylinePoints))
-            polyline.strokeColor = UIColor.black
-            polyline.zIndex = 100
+    func onClusterAdded(with cluster: YMKCluster) {
+        // We setup cluster appearance and tap handler in this method
+        cluster.appearance.setIconWith(clusterImage(cluster.size))
+        cluster.addClusterTapListener(with: self)
+    }
 
-            let coloredPolylinePoints = [
-                YMKPoint(
-                    latitude: 59.949941,
-                    longitude: 30.310250),
-                YMKPoint(
-                    latitude: 59.950867,
-                    longitude: 30.313382),
-                YMKPoint(
-                    latitude: 59.949596,
-                    longitude: 30.315056),
-                YMKPoint(
-                    latitude: 59.951103,
-                    longitude:  30.321622)
-            ]
-
-            let coloredPolyline = mapObjects.addColoredPolyline(with: YMKPolyline(points: coloredPolylinePoints))
-            
-            // lets define colors for each polyline segment
-            coloredPolyline.setPaletteColorWithColorIndex(0, color: UIColor.yellow)
-            coloredPolyline.setPaletteColorWithColorIndex(1, color: UIColor.green)
-            coloredPolyline.setPaletteColorWithColorIndex(2, color: UIColor.purple)
-            coloredPolyline.setColorsWithColors([0, 1, 2])
-
-            // Maximum pgradient length in screen points.
-            coloredPolyline.gradientLength = 250
-            coloredPolyline.strokeWidth = 15
-            coloredPolyline.zIndex = 100
-
-            let placemark = mapObjects.addPlacemark(with: DRAGGABLE_PLACEMARK_CENTER)
-            placemark.opacity = 0.5
-            placemark.isDraggable = true
-            placemark.setIconWith(UIImage(named:"Mark")!)
-
-            createPlacemarkMapObjectWithViewProvider();
-            createAnimatedPlacemark();
-        }
-
-        private class CircleMapObjectTapListener: NSObject, YMKMapObjectTapListener {
-            private weak var controller: UIViewController?
-
-            init(controller: UIViewController) {
-                self.controller = controller
-            }
-
-            func onMapObjectTap(with mapObject: YMKMapObject, point: YMKPoint) -> Bool {
-                if let circle = mapObject as? YMKCircleMapObject {
-                    let randomRadius: Float = 100.0 + 50.0 * Float.random(in: 0..<10);
-                    let curGeometry = circle.geometry;
-                    circle.geometry = YMKCircle(center: curGeometry.center, radius: randomRadius);
-
-                    if let userData = circle.userData as? CircleMapObjectUserData {
-                        let message = "Circle with id \(userData.id) and description '\(userData.description)' tapped";
-                        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert);
-                        alert.view.backgroundColor = UIColor.darkGray;
-                        alert.view.alpha = 0.8;
-                        alert.view.layer.cornerRadius = 15;
-
-                        controller?.present(alert, animated: true);
-                        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
-                            alert.dismiss(animated: true);
-                        }
-                    }
-                }
-                return true;
-            }
-        }
-
-        private class CircleMapObjectUserData {
-            let id: Int32;
-            let description: String;
-            init(id: Int32, description: String) {
-                self.id = id;
-                self.description = description;
-            }
-        }
-
-        func createTappableCircle() {
-            let mapObjects = mapView.mapWindow.map.mapObjects;
-            let circle = mapObjects.addCircle(
-                with: YMKCircle(center: CIRCLE_CENTER, radius: 100),
-                stroke: UIColor.green,
-                strokeWidth: 2,
-                fill: UIColor.red)
-            circle.zIndex = 100
-            circle.userData = CircleMapObjectUserData(id: 42, description: "Tappable circle");
-
-            // Client code must retain strong reference to the listener.
-            circleMapObjectTapListener = CircleMapObjectTapListener(controller: self);
-            circle.addTapListener(with: circleMapObjectTapListener);
-        }
-
-        func createPlacemarkMapObjectWithViewProvider() {
-            let textView =
-                UITextView(frame: CGRect(x: 0, y: 0, width: 200, height: 30));
-            let colors = [UIColor.red, UIColor.green, UIColor.black];
-
-            textView.isOpaque = false;
-            textView.backgroundColor = UIColor.clear.withAlphaComponent(0.0);
-            textView.text = "Hello, World!";
-            textView.textColor = UIColor.red;
-
-            let viewProvider = YRTViewProvider(uiView: textView);
-
-            let mapObjects = mapView.mapWindow.map.mapObjects;
-            let viewPlacemark = mapObjects.addPlacemark(
-                with: YMKPoint(latitude: 59.946263, longitude: 30.315181),
-                view: viewProvider!);
-
-            let delayToShowInitialText = 5.0;  // seconds
-            let delayToShowRandomText = 0.5; // seconds
-            // Show initial text `delayToShowInitialText` seconds and then
-            // randomly change text in textView every `delayToShowRandomText` seconds
-            DispatchQueue.main.asyncAfter(deadline: .now() + delayToShowInitialText) {
-
-                func doMainLoop() {
-                    if !self.animationIsActive {
-                        return
-                    }
-
-                    let randomInt = Int(arc4random_uniform(1000));
-                    textView.text = "Some text " + String(randomInt);
-                    textView.textColor = colors[randomInt % colors.count];
-                    viewProvider?.snapshot();
-                    viewPlacemark.setViewWithView(viewProvider!);
-
-                    DispatchQueue.main.asyncAfter(deadline: .now() + delayToShowRandomText) {
-                        doMainLoop()
-                    }
-                }
-
-                doMainLoop();
-            }
+    func onClusterTap(with cluster: YMKCluster) -> Bool {
+        var format = ""
+        if cluster.size > 5 {
+            format = "В этой точке %u локаций"
+        } else {
+            format = "В этой точке %u локации"
         }
         
-        func createAnimatedPlacemark() {
-            let animatedImageProvider = YRTAnimatedImageProviderFactory.fromFile(
-                Bundle.main.path(forResource: "Animations/animation", ofType: "png")) as! YRTAnimatedImageProvider
-            let mapObjects = mapView.mapWindow.map.mapObjects;
-            let animatedPlacemark = mapObjects.addPlacemark(with: ANIMATED_PLACEMARK_CENTER, animatedImage: animatedImageProvider, style: YMKIconStyle())
-            animatedPlacemark.useAnimation().play()
+        let alert = UIAlertController(
+            title: "",
+            message: String(format: format, cluster.size),
+            preferredStyle: .alert)
+        alert.addAction(
+            UIAlertAction(title: "Ок", style: .default, handler: nil))
+
+        present(alert, animated: true, completion: nil)
+
+        // We return true to notify map that the tap was handled and shouldn't be
+        // propagated further.
+        return true
+    }
+    
+    // MARK: - Map logic
+    
+    func clusterImage(_ clusterSize: UInt) -> UIImage {
+        let scale = UIScreen.main.scale
+        let text = (clusterSize as NSNumber).stringValue
+        let font = UIFont.systemFont(ofSize: FONT_SIZE * scale)
+        let size = text.size(withAttributes: [NSAttributedString.Key.font: font])
+        let textRadius = sqrt(size.height * size.height + size.width * size.width) / 2
+        let internalRadius = textRadius + MARGIN_SIZE * scale
+        let externalRadius = internalRadius + STROKE_SIZE * scale
+        let iconSize = CGSize(width: externalRadius * 2, height: externalRadius * 2)
+
+        UIGraphicsBeginImageContext(iconSize)
+        let ctx = UIGraphicsGetCurrentContext()!
+
+        ctx.setFillColor(UIColor.green.cgColor)
+        ctx.fillEllipse(in: CGRect(
+            origin: .zero,
+            size: CGSize(width: 2 * externalRadius, height: 2 * externalRadius)));
+
+        ctx.setFillColor(UIColor.white.cgColor)
+        ctx.fillEllipse(in: CGRect(
+            origin: CGPoint(x: externalRadius - internalRadius, y: externalRadius - internalRadius),
+            size: CGSize(width: 2 * internalRadius, height: 2 * internalRadius)));
+
+        (text as NSString).draw(
+            in: CGRect(
+                origin: CGPoint(x: externalRadius - size.width / 2, y: externalRadius - size.height / 2),
+                size: size),
+            withAttributes: [
+                NSAttributedString.Key.font: font,
+                NSAttributedString.Key.foregroundColor: UIColor.black])
+        let image = UIGraphicsGetImageFromCurrentImageContext()!
+        return image
+    }
+
+    func randomDouble() -> Double {
+        return Double(arc4random()) / Double(UINT32_MAX)
+    }
+
+    func createPoints() -> [YMKPoint]{
+        var points = [YMKPoint]()
+        for _ in 0..<PLACEMARKS_NUMBER {
+            let clusterCenter = CLUSTER_CENTERS.randomElement()!
+            let latitude = clusterCenter.latitude + randomDouble()  - 0.5
+            let longitude = clusterCenter.longitude + randomDouble()  - 0.5
+
+            points.append(YMKPoint(latitude: latitude, longitude: longitude))
         }
+
+        return points
+    }
+    
+    // MARK: - Map tap protocol conformation
+    
+    func onMapObjectTap(with mapObject: YMKMapObject, point: YMKPoint) -> Bool {
+        
+        print(point.latitude, point.longitude)
+        return true
+    }
+    
+    
+    // MARK: - Navigation
+    
+    @objc func showActivityScreen(animated: Bool = true) {
+        let activityViewController = ActivityViewController()
+        navigationController?.pushViewController(activityViewController, animated: animated)
+    }
+    
+    @objc func menuButtonPressed() {
+        print("menu")
+//        AppDelegate.shared.rootViewController.switchToSettings()
+        
+        let vc = SettingsViewController()
+        vc.modalPresentationStyle = .overFullScreen
+        self.present(vc, animated: true, completion: nil)
+    }
+    
+    @objc func addButtonPressed() {
+        print("add")
+        if !UserDefaults.standard.bool(forKey: "LOGGED_IN") {
+            let alert = UIAlertController(title: "", message: "Доступно только авторизованным пользователям", preferredStyle: .alert)
+            self.present(alert, animated: true, completion: nil)
+
+            // change to desired number of seconds (in this case 5 seconds)
+            let when = DispatchTime.now() + 2
+            DispatchQueue.main.asyncAfter(deadline: when){
+                // your code with delay
+                alert.dismiss(animated: true, completion: nil)
+                self.dismiss(animated: true, completion: nil)
+            }
+        } else {
+            let vc = AddLocationViewController()
+            vc.modalPresentationStyle = .overFullScreen
+            self.present(vc, animated: true, completion: nil)
+        }
+    }
+    
+    @objc func zoomInButtonPressed() {
+        print("zoomInButtonPressed")
+        if self.zoomLvl <= 20 {
+            self.zoomLvl += 1
+            
+            mapView.mapWindow.zoomFocusPoint = .none
+            let point = YMKPoint(latitude: 55.75266014718742, longitude: 37.63247677612304)
+
+            print(zoomLvl)
+            mapView.mapWindow.map.move(with:
+                YMKCameraPosition(target: point, zoom: zoomLvl, azimuth: 0, tilt: 0))
+        }
+        
+    }
+    
+    @objc func zoomOutButtonPressed() {
+        print("zoomOutButtonPressed")
+        
+        if self.zoomLvl >= 3 {
+            self.zoomLvl -= 1
+            let point = YMKPoint(latitude: 55.75266014718742, longitude: 37.63247677612304)
+
+            mapView.mapWindow.map.move(with:
+                YMKCameraPosition(target: point, zoom: zoomLvl, azimuth: 0, tilt: 0))
+        }
+    }
+    
+    @objc func locButtonPressed() {
+        print("locButtonPressed")
+        
+        let mapObjects = mapView.mapWindow.map.mapObjects
+        let point = YMKPoint(latitude: 55.75266014718742, longitude: 37.63247677612304)
+        let placemark = mapObjects.addPlacemark(with: point)
+        placemark.setIconWith(UIImage(named: "user_arrow")!)
+        
+        mapView.mapWindow.map.move(with:
+            YMKCameraPosition(target: point, zoom: 14, azimuth: 0, tilt: 0))
+        self.zoomLvl = 14
+    }
+    
+    @objc func userIconButtonPressed() {
+        print("userIconButtonPressed")
+    }
+    
+    @objc func newLocsButtonPressed() {
+        print("newLocsButtonGesture")
+        
+        let mapObjects = mapView.mapWindow.map.mapObjects
+        mapObjects.clear()
+        
+        
+        // Note that application must retain strong references to both
+        // cluster listener and cluster tap listener
+        let collection = mapView.mapWindow.map.mapObjects.addClusterizedPlacemarkCollection(with: self)
+
+//        let points = createPoints()
+        
+        let points = getRealObjects()
+        
+        collection.addPlacemarks(with: points, image: self.imageProvider, style: YMKIconStyle())
+        collection.addTapListener(with: self)
+        
+        let point = YMKPoint(latitude: 55.75266014718742, longitude: 37.63247677612304)
+        let placemark = mapObjects.addPlacemark(with: point)
+        placemark.setIconWith(UIImage(named: "user_arrow")!)
+        // Placemarks won't be displayed until this method is called. It must be also called
+        // to force clusters update after collection change
+        collection.clusterPlacemarks(withClusterRadius: 60, minZoom: 15)
+    }
+    
+    @objc func sampleButtonPressed() {
+        print("sampleButtonPressed")
+        
+        let mapObjects = mapView.mapWindow.map.mapObjects
+        mapObjects.clear()
+        
+        
+        // Note that application must retain strong references to both
+        // cluster listener and cluster tap listener
+        let collection = mapView.mapWindow.map.mapObjects.addClusterizedPlacemarkCollection(with: self)
+
+        let points = createPoints()
+            
+        collection.addPlacemarks(with: points, image: self.imageProvider, style: YMKIconStyle())
+        collection.addTapListener(with: self)
+        
+        let point = YMKPoint(latitude: 55.75266014718742, longitude: 37.63247677612304)
+        let placemark = mapObjects.addPlacemark(with: point)
+        placemark.setIconWith(UIImage(named: "user_arrow")!)
+        // Placemarks won't be displayed until this method is called. It must be also called
+        // to force clusters update after collection change
+        collection.clusterPlacemarks(withClusterRadius: 60, minZoom: 15)
+    }
+    
+    
+    private func getRealObjects() -> [YMKPoint] {
+        let sem = DispatchSemaphore.init(value: 0)
+
+        var points: [YMKPoint] = []
+        guard let url = URL(string: "http://134.0.117.63:8081/get_places") else { return [] }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        let parameters = ["x1_lat": 10.0, "x1_long": 10.0, "x2_lat": 150.200, "x2_long": 160.20, "category_id": "test category", "secret": "secret"] as [String : Any]
+        
+        guard let httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: []) else {
+            return []
+        }
+        request.httpBody = httpBody
+        
+        let session = URLSession.shared
+        session.dataTask(with: request) { (data, response, error) in
+            guard let data = data else { return }
+            let strResponse = String(decoding: data, as: UTF8.self)
+            
+            do {
+                let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [[String:Any]]
+                let values = json as? [[String: Any]] ?? []
+                print(values)
+                for value in values {
+                    points.append(YMKPoint(latitude: value["lat"] as! Double, longitude: value["long"] as! Double))
+                }
+            } catch {
+                print(error)
+            }
+            
+            defer { sem.signal() }
+        }.resume()
+        
+        sem.wait()
+
+        return points
+    }
 }
 

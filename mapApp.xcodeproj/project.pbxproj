@@ -8,26 +8,38 @@
 
 /* Begin PBXBuildFile section */
 		5FCBC330107EA48A88B389C3 /* Pods_mapApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 90B01A4E386C41570BE0066E /* Pods_mapApp.framework */; };
+		7D25F5282741106F005B9DD0 /* ActivityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D25F5272741106F005B9DD0 /* ActivityViewController.swift */; };
+		7D25F52C27411313005B9DD0 /* DeepLinkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D25F52A27411313005B9DD0 /* DeepLinkManager.swift */; };
+		7D25F52D27411313005B9DD0 /* ShortcutParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D25F52B27411313005B9DD0 /* ShortcutParser.swift */; };
+		7D25F531274117C6005B9DD0 /* SplashViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D25F530274117C6005B9DD0 /* SplashViewController.swift */; };
+		7D25F53327413EFA005B9DD0 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D25F53227413EFA005B9DD0 /* SettingsViewController.swift */; };
+		7D25F5352741474A005B9DD0 /* AddLocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D25F5342741474A005B9DD0 /* AddLocationViewController.swift */; };
 		7D440E8A2737F63E00136627 /* EntryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D440E872737F63E00136627 /* EntryViewController.swift */; };
 		7D440E8B2737F63E00136627 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D440E882737F63E00136627 /* LoginViewController.swift */; };
 		7D440E8C2737F63E00136627 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D440E892737F63E00136627 /* RegisterViewController.swift */; };
 		7D440E902737F67F00136627 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D440E8E2737F67F00136627 /* AppDelegate.swift */; };
-		7D440E912737F67F00136627 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D440E8F2737F67F00136627 /* SceneDelegate.swift */; };
 		7D440E952737F6FB00136627 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D440E942737F6FB00136627 /* MapViewController.swift */; };
 		7D440E972738453100136627 /* ForgotPasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D440E962738453100136627 /* ForgotPasswordViewController.swift */; };
+		7D440E992738564600136627 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D440E982738564600136627 /* RootViewController.swift */; };
 		7DD891E72708440500724B6A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7DD891E62708440500724B6A /* Assets.xcassets */; };
 		7DD891EA2708440600724B6A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7DD891E82708440600724B6A /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		6FABBA0E11C486DF53CF1EB0 /* Pods-mapApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mapApp.release.xcconfig"; path = "Target Support Files/Pods-mapApp/Pods-mapApp.release.xcconfig"; sourceTree = "<group>"; };
+		7D25F5272741106F005B9DD0 /* ActivityViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityViewController.swift; sourceTree = "<group>"; };
+		7D25F52A27411313005B9DD0 /* DeepLinkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeepLinkManager.swift; sourceTree = "<group>"; };
+		7D25F52B27411313005B9DD0 /* ShortcutParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShortcutParser.swift; sourceTree = "<group>"; };
+		7D25F530274117C6005B9DD0 /* SplashViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplashViewController.swift; sourceTree = "<group>"; };
+		7D25F53227413EFA005B9DD0 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		7D25F5342741474A005B9DD0 /* AddLocationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddLocationViewController.swift; sourceTree = "<group>"; };
 		7D440E872737F63E00136627 /* EntryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntryViewController.swift; sourceTree = "<group>"; };
 		7D440E882737F63E00136627 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		7D440E892737F63E00136627 /* RegisterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
 		7D440E8E2737F67F00136627 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		7D440E8F2737F67F00136627 /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		7D440E942737F6FB00136627 /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		7D440E962738453100136627 /* ForgotPasswordViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgotPasswordViewController.swift; sourceTree = "<group>"; };
+		7D440E982738564600136627 /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
 		7DD891DA2708440400724B6A /* mapApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = mapApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7DD891E62708440500724B6A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7DD891E92708440600724B6A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -56,6 +68,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		7D25F52927411313005B9DD0 /* Deeplink */ = {
+			isa = PBXGroup;
+			children = (
+				7D25F52A27411313005B9DD0 /* DeepLinkManager.swift */,
+				7D25F52B27411313005B9DD0 /* ShortcutParser.swift */,
+			);
+			path = Deeplink;
+			sourceTree = "<group>";
+		};
 		7D440E862737F61D00136627 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
@@ -71,7 +92,6 @@
 			isa = PBXGroup;
 			children = (
 				7D440E8E2737F67F00136627 /* AppDelegate.swift */,
-				7D440E8F2737F67F00136627 /* SceneDelegate.swift */,
 			);
 			path = AppDelegate;
 			sourceTree = "<group>";
@@ -89,7 +109,12 @@
 		7D440E932737F6DD00136627 /* Map */ = {
 			isa = PBXGroup;
 			children = (
+				7D25F5272741106F005B9DD0 /* ActivityViewController.swift */,
 				7D440E942737F6FB00136627 /* MapViewController.swift */,
+				7D25F530274117C6005B9DD0 /* SplashViewController.swift */,
+				7D440E982738564600136627 /* RootViewController.swift */,
+				7D25F53227413EFA005B9DD0 /* SettingsViewController.swift */,
+				7D25F5342741474A005B9DD0 /* AddLocationViewController.swift */,
 			);
 			path = Map;
 			sourceTree = "<group>";
@@ -116,6 +141,7 @@
 			isa = PBXGroup;
 			children = (
 				7D440E8D2737F65E00136627 /* AppDelegate */,
+				7D25F52927411313005B9DD0 /* Deeplink */,
 				7D440E932737F6DD00136627 /* Map */,
 				7D440E862737F61D00136627 /* Onboarding */,
 				7D440E922737F6B700136627 /* Supporting Files */,
@@ -268,9 +294,15 @@
 				7D440E972738453100136627 /* ForgotPasswordViewController.swift in Sources */,
 				7D440E952737F6FB00136627 /* MapViewController.swift in Sources */,
 				7D440E8C2737F63E00136627 /* RegisterViewController.swift in Sources */,
+				7D25F52D27411313005B9DD0 /* ShortcutParser.swift in Sources */,
+				7D25F5352741474A005B9DD0 /* AddLocationViewController.swift in Sources */,
 				7D440E902737F67F00136627 /* AppDelegate.swift in Sources */,
 				7D440E8B2737F63E00136627 /* LoginViewController.swift in Sources */,
-				7D440E912737F67F00136627 /* SceneDelegate.swift in Sources */,
+				7D25F52C27411313005B9DD0 /* DeepLinkManager.swift in Sources */,
+				7D440E992738564600136627 /* RootViewController.swift in Sources */,
+				7D25F5282741106F005B9DD0 /* ActivityViewController.swift in Sources */,
+				7D25F531274117C6005B9DD0 /* SplashViewController.swift in Sources */,
+				7D25F53327413EFA005B9DD0 /* SettingsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
